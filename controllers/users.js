@@ -18,6 +18,8 @@ module.exports.editUser = (req, res, next) => {
         next(new BadRequestError(err.message));
       } else if (err.name === 'DocumentNotFoundError') {
         next(new NotFoundError('User not found'));
+      } else if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже зарегестрирован'));
       } else {
         next(err);
       }

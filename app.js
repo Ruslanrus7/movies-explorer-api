@@ -9,8 +9,9 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const router = require('./routes/index');
 
 const { PORT = 3000 } = process.env;
+const { DB_ADRESS = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 
-mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb', {
+mongoose.connect(DB_ADRESS, {
   useNewUrlParser: true,
 })
   .then(() => {
@@ -38,15 +39,7 @@ app.use('*', (req, res, next) => {
   next(new NotFoundError('страница не найдена'));
 });
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res.status(statusCode)
-    .send({
-      message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-    });
-  next();
-});
+app.use(require('./middlewares/error-handler'));
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
